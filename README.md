@@ -249,7 +249,7 @@ MAX_CONCURRENT_DOWNLOADS=5
 - 💻 **[Working System](Deliverables/WORKING_SYSTEM.md)** - System operation guide
 - 🔍 **[Example Queries](Deliverables/EXAMPLE_QUERIES.md)** - Sample questions and responses
 - ✅ **[Validation Report](Deliverables/VALIDATION_REPORT.md)** - Testing results and metrics
-- 🔧 **[Implementation Specs](.kiro/specs/document-search-fix/)** - Recent system improvements
+- 🔧 **[Environment Setup Guide](ENVIRONMENT_SETUP_GUIDE.md)** - Comprehensive configuration guide
 
 ## 🤝 Contributing
 
@@ -267,7 +267,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 <div align="center">
 
-**🎯 Ready for Assessment | 🚀 Production Quality | 📊 Fully Documented | 🔧 Recently Enhanced**
+**🎯 Ready for Assessment | 🚀 Production Quality | 📊 Fully Documented | 🔧 Environment Configurable**
 
 *Built with ❤️ for financial research and analysis*
 
