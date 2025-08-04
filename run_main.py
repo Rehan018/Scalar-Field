@@ -32,7 +32,7 @@ except Exception as e:
     print("\nKey Features:")
     print("- 15 companies across sectors")
     print("- Multiple SEC filing types")
-    print("- Gemini AI integration")
+    print("- Local LLM integration (Ollama)")
     print("- Query processing and routing")
     print("- Source attribution")
     

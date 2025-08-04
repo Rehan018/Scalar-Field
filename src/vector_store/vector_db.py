@@ -7,7 +7,10 @@ from datetime import datetime
 
 from .embeddings import EmbeddingGenerator
 from document_processing.document_chunker import DocumentChunk
-from config.settings import CHROMA_PERSIST_DIRECTORY
+from config.settings import (
+    CHROMA_PERSIST_DIRECTORY, MIN_SIMILARITY_THRESHOLD,
+    TFIDF_SEMANTIC_WEIGHT, TFIDF_KEYWORD_WEIGHT
+)
 
 
 class VectorDB:
@@ -78,11 +81,11 @@ class VectorDB:
             keyword_score = self._calculate_enhanced_keyword_score(chunk['text'], query_words)
             
             if self.embedding_generator.use_fallback:
-                combined_score = 0.4 * semantic_score + 0.6 * keyword_score
-                min_threshold = 0.05
+                combined_score = TFIDF_SEMANTIC_WEIGHT * semantic_score + TFIDF_KEYWORD_WEIGHT * keyword_score
+                min_threshold = MIN_SIMILARITY_THRESHOLD
             else:
                 combined_score = 0.7 * semantic_score + 0.3 * keyword_score
-                min_threshold = 0.1
+                min_threshold = MIN_SIMILARITY_THRESHOLD
             
             if combined_score > min_threshold:
                 results.append({

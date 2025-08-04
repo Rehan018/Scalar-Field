@@ -3,18 +3,26 @@ import json
 from typing import List, Dict, Optional
 import time
 
-from config.settings import LLM_MODEL, MAX_TOKENS, TEMPERATURE
+from config.settings import (
+    LLM_MODEL, MAX_TOKENS, TEMPERATURE, OLLAMA_URL, OLLAMA_MODEL,
+    REQUEST_TIMEOUT, MAX_RETRIES, BACKOFF_MAX_TIME
+)
 
 
 class LLMClient:
     def __init__(self):
-        self.ollama_url = "http://10.10.110.25:11434"
-        self.model_name = "llama3.1:8b"
+        self.ollama_url = OLLAMA_URL
+        self.model_name = OLLAMA_MODEL
         self.max_tokens = MAX_TOKENS
         self.temperature = TEMPERATURE
+        self.request_timeout = REQUEST_TIMEOUT
+        self.max_retries = MAX_RETRIES
+        self.backoff_max_time = BACKOFF_MAX_TIME
     
-    def generate_answer(self, prompt: str, max_retries: int = 3) -> Dict:
-        
+    def generate_answer(self, prompt: str, max_retries: int = None) -> Dict:
+        if max_retries is None:
+            max_retries = self.max_retries
+            
         optimized_prompt = self._optimize_prompt(prompt)
         
         for attempt in range(max_retries):
@@ -32,7 +40,7 @@ class LLMClient:
                 response = requests.post(
                     f"{self.ollama_url}/api/generate",
                     json=payload,
-                    timeout=120
+                    timeout=self.request_timeout
                 )
                 
                 if response.status_code == 200:
@@ -114,7 +122,7 @@ class LLMClient:
         base_wait = (2 ** (attempt + 1)) - 2
         jitter = random.uniform(0.5, 1.5)
         
-        return min(int(base_wait * jitter), 120)
+        return min(int(base_wait * jitter), self.backoff_max_time)
     
     def generate_summary(self, text: str, max_length: int = 200) -> str:
         
