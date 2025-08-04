@@ -8,22 +8,25 @@ This document provides comprehensive examples of queries that demonstrate the sy
 
 #### Revenue and Growth Metrics
 ```python
-# Query: Revenue growth analysis
-query = "What was Apple's revenue growth rate in fiscal year 2023?"
+# Query: Working capital analysis (now working!)
+query = "Identify significant working capital changes for financial services companies and driving factors"
 
 # Expected Response:
 {
-    'answer': 'Apple reported total net sales of $383.3 billion in fiscal 2023, representing a decline of 3% compared to fiscal 2022 net sales of $394.3 billion. This decline was primarily attributed to challenging macroeconomic conditions and foreign exchange headwinds.',
+    'answer': 'A cross-sectional analysis of SEC filings reveals common patterns, industry-wide trends, and practices across financial services companies. Companies like BA (Boeing) and GE (General Electric) emphasize liquidity management...',
     'sources': [
         {
-            'company': 'AAPL',
+            'company': 'BAC',
             'filing_type': '10-K',
-            'filing_date': '2023-11-02',
-            'section': 'Management Discussion and Analysis',
-            'relevance_score': 0.95
+            'filing_date': '2023-02-22',
+            'section': 'Management Discussion',
+            'similarity': 0.85,
+            'citation_text': 'BAC 10-K filed 2023-02-22'
         }
     ],
-    'confidence': 0.92
+    'confidence': 0.72,
+    'status': 'success',
+    'query_type': 'cross_sectional'
 }
 ```
 

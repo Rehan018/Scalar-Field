@@ -62,7 +62,7 @@ MAX_TOKENS = int(os.getenv("MAX_TOKENS", 2000))
 TEMPERATURE = float(os.getenv("TEMPERATURE", 0.1))
 
 # Data paths
-DATA_DIR = "./data"
-RAW_DATA_DIR = "./data/raw"
-PROCESSED_DATA_DIR = "./data/processed"
-EMBEDDINGS_DIR = "./data/embeddings"
+DATA_DIR = "./src/data"
+RAW_DATA_DIR = "./src/data/raw"
+PROCESSED_DATA_DIR = "./src/data/processed"
+EMBEDDINGS_DIR = "./src/data/embeddings"

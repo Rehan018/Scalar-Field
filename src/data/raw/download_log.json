@@ -1,34 +1,34 @@
 {
-  "download_timestamp": 38006.687,
+  "download_timestamp": 6045.538555984,
   "summary": {
     "total_companies": 15,
     "successful_companies": 15,
     "failed_companies": 0,
-    "total_files_downloaded": 0,
+    "total_files_downloaded": 209,
     "sector_breakdown": {
       "Technology": {
         "companies": 3,
-        "files": 0
+        "files": 29
       },
       "Finance": {
         "companies": 3,
-        "files": 0
+        "files": 51
       },
       "Healthcare": {
         "companies": 2,
-        "files": 0
+        "files": 31
       },
       "Energy": {
         "companies": 2,
-        "files": 0
+        "files": 30
       },
       "Retail": {
         "companies": 2,
-        "files": 0
+        "files": 29
       },
       "Manufacturing": {
         "companies": 3,
-        "files": 0
+        "files": 39
       }
     },
     "success_rate": "100.0%"
@@ -38,120 +38,344 @@
       "ticker": "AAPL",
       "company_name": "Apple Inc.",
       "sector": "Technology",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/AAPL_10-K_20231102.html",
+        "./src/data/raw/AAPL_10-K_20221027.html",
+        "./src/data/raw/AAPL_10-Q_20230803.html",
+        "./src/data/raw/AAPL_10-Q_20230202.html",
+        "./src/data/raw/AAPL_10-Q_20220428.html",
+        "./src/data/raw/AAPL_8-K_20230504.html",
+        "./src/data/raw/AAPL_8-K_20230510.html",
+        "./src/data/raw/AAPL_8-K_20230803.html",
+        "./src/data/raw/AAPL_DEF 14A_20230112.html",
+        "./src/data/raw/AAPL_DEF 14A_20220106.html",
+        "./src/data/raw/AAPL_4_20231010.html",
+        "./src/data/raw/AAPL_4_20231114.html",
+        "./src/data/raw/AAPL_4_20231201.html"
+      ],
+      "total_files": 13,
       "status": "success"
     },
     {
       "ticker": "MSFT",
       "company_name": "Microsoft Corporation",
       "sector": "Technology",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/MSFT_10-K_20220728.html",
+        "./src/data/raw/MSFT_10-K_20230727.html",
+        "./src/data/raw/MSFT_10-Q_20230425.html",
+        "./src/data/raw/MSFT_10-Q_20231024.html",
+        "./src/data/raw/MSFT_10-Q_20221025.html",
+        "./src/data/raw/MSFT_8-K_20231208.html",
+        "./src/data/raw/MSFT_8-K_20231016.html",
+        "./src/data/raw/MSFT_8-K_20231024.html",
+        "./src/data/raw/MSFT_DEF 14A_20231019.html",
+        "./src/data/raw/MSFT_DEF 14A_20221027.html",
+        "./src/data/raw/MSFT_3_20231117.html",
+        "./src/data/raw/MSFT_3_20231201.html",
+        "./src/data/raw/MSFT_3_20231208.html",
+        "./src/data/raw/MSFT_4_20231215.html",
+        "./src/data/raw/MSFT_4_20231229.html"
+      ],
+      "total_files": 15,
       "status": "success"
     },
     {
       "ticker": "GOOGL",
       "company_name": "Alphabet Inc.",
       "sector": "Technology",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/GOOGL_4_20220111.html"
+      ],
+      "total_files": 1,
       "status": "success"
     },
     {
       "ticker": "JPM",
       "company_name": "JPMorgan Chase & Co.",
       "sector": "Finance",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/JPM_10-K_20230221.html",
+        "./src/data/raw/JPM_10-K_20220222.html",
+        "./src/data/raw/JPM_10-Q_20230503.html",
+        "./src/data/raw/JPM_10-Q_20220803.html",
+        "./src/data/raw/JPM_10-Q_20231101.html",
+        "./src/data/raw/JPM_8-K_20231026.html",
+        "./src/data/raw/JPM_8-K_20231023.html",
+        "./src/data/raw/JPM_8-K_20230922.html",
+        "./src/data/raw/JPM_DEF 14A_20220404.html",
+        "./src/data/raw/JPM_DEF 14A_20230404.html",
+        "./src/data/raw/JPM_3_20230328.html",
+        "./src/data/raw/JPM_3_20230224.html",
+        "./src/data/raw/JPM_3_20230413.html",
+        "./src/data/raw/JPM_4_20231026.html",
+        "./src/data/raw/JPM_4_20231212.html",
+        "./src/data/raw/JPM_4_20231211.html"
+      ],
+      "total_files": 16,
       "status": "success"
     },
     {
       "ticker": "BAC",
       "company_name": "Bank of America Corporation",
       "sector": "Finance",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/BAC_10-K_20220222.html",
+        "./src/data/raw/BAC_10-K_20230222.html",
+        "./src/data/raw/BAC_10-Q_20221028.html",
+        "./src/data/raw/BAC_10-Q_20220729.html",
+        "./src/data/raw/BAC_10-Q_20231031.html",
+        "./src/data/raw/BAC_8-K_20230705.html",
+        "./src/data/raw/BAC_8-K_20230718.html",
+        "./src/data/raw/BAC_8-K_20231017.html",
+        "./src/data/raw/BAC_DEF 14A_20220307.html",
+        "./src/data/raw/BAC_DEF 14A_20230307.html",
+        "./src/data/raw/BAC_3_20230724.html",
+        "./src/data/raw/BAC_3_20231030.html",
+        "./src/data/raw/BAC_3_20231220.html",
+        "./src/data/raw/BAC_4_20231229.html",
+        "./src/data/raw/BAC_4_20231222.html",
+        "./src/data/raw/BAC_4_20231220.html",
+        "./src/data/raw/BAC_5_20220127.html",
+        "./src/data/raw/BAC_5_20230127.html"
+      ],
+      "total_files": 18,
       "status": "success"
     },
     {
       "ticker": "WFC",
       "company_name": "Wells Fargo & Company",
       "sector": "Finance",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/WFC_10-K_20230221.html",
+        "./src/data/raw/WFC_10-K_20220222.html",
+        "./src/data/raw/WFC_10-Q_20231031.html",
+        "./src/data/raw/WFC_10-Q_20230502.html",
+        "./src/data/raw/WFC_10-Q_20230804.html",
+        "./src/data/raw/WFC_8-K_20230918.html",
+        "./src/data/raw/WFC_8-K_20230810.html",
+        "./src/data/raw/WFC_8-K_20231213.html",
+        "./src/data/raw/WFC_DEF 14A_20220314.html",
+        "./src/data/raw/WFC_DEF 14A_20230315.html",
+        "./src/data/raw/WFC_3_20230925.html",
+        "./src/data/raw/WFC_3_20230922.html",
+        "./src/data/raw/WFC_3_20231106.html",
+        "./src/data/raw/WFC_4_20231024.html",
+        "./src/data/raw/WFC_4_20231003.html",
+        "./src/data/raw/WFC_4_20231011.html",
+        "./src/data/raw/WFC_5_20230214.html"
+      ],
+      "total_files": 17,
       "status": "success"
     },
     {
       "ticker": "JNJ",
       "company_name": "Johnson & Johnson",
       "sector": "Healthcare",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/JNJ_10-K_20230216.html",
+        "./src/data/raw/JNJ_10-K_20220217.html",
+        "./src/data/raw/JNJ_10-Q_20221027.html",
+        "./src/data/raw/JNJ_10-Q_20230731.html",
+        "./src/data/raw/JNJ_10-Q_20230428.html",
+        "./src/data/raw/JNJ_8-K_20231130.html",
+        "./src/data/raw/JNJ_8-K_20231205.html",
+        "./src/data/raw/JNJ_8-K_20231127.html",
+        "./src/data/raw/JNJ_DEF 14A_20230315.html",
+        "./src/data/raw/JNJ_DEF 14A_20220316.html",
+        "./src/data/raw/JNJ_3_20230413.html",
+        "./src/data/raw/JNJ_3_20231208.html",
+        "./src/data/raw/JNJ_3_20230510.html",
+        "./src/data/raw/JNJ_4_20230911.html",
+        "./src/data/raw/JNJ_4_20231207.html",
+        "./src/data/raw/JNJ_4_20230825.html"
+      ],
+      "total_files": 16,
       "status": "success"
     },
     {
       "ticker": "PFE",
       "company_name": "Pfizer Inc.",
       "sector": "Healthcare",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/PFE_10-K_20220224.html",
+        "./src/data/raw/PFE_10-K_20230223.html",
+        "./src/data/raw/PFE_10-Q_20221109.html",
+        "./src/data/raw/PFE_10-Q_20231108.html",
+        "./src/data/raw/PFE_10-Q_20230809.html",
+        "./src/data/raw/PFE_8-K_20231031.html",
+        "./src/data/raw/PFE_8-K_20231214.html",
+        "./src/data/raw/PFE_8-K_20231213.html",
+        "./src/data/raw/PFE_DEF 14A_20220317.html",
+        "./src/data/raw/PFE_DEF 14A_20230316.html",
+        "./src/data/raw/PFE_3_20231221.html",
+        "./src/data/raw/PFE_3_20230804.html",
+        "./src/data/raw/PFE_3_20230330.html",
+        "./src/data/raw/PFE_4_20231219.html",
+        "./src/data/raw/PFE_4_20231229.html"
+      ],
+      "total_files": 15,
       "status": "success"
     },
     {
       "ticker": "XOM",
       "company_name": "Exxon Mobil Corporation",
       "sector": "Energy",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/XOM_10-K_20230222.html",
+        "./src/data/raw/XOM_10-K_20220223.html",
+        "./src/data/raw/XOM_10-Q_20231031.html",
+        "./src/data/raw/XOM_10-Q_20220803.html",
+        "./src/data/raw/XOM_10-Q_20230801.html",
+        "./src/data/raw/XOM_8-K_20231206.html",
+        "./src/data/raw/XOM_8-K_20231115.html",
+        "./src/data/raw/XOM_8-K_20231107.html",
+        "./src/data/raw/XOM_DEF 14A_20230413.html",
+        "./src/data/raw/XOM_DEF 14A_20220407.html",
+        "./src/data/raw/XOM_3_20220408.html",
+        "./src/data/raw/XOM_3_20230105.html",
+        "./src/data/raw/XOM_3_20220429.html",
+        "./src/data/raw/XOM_4_20231205.html",
+        "./src/data/raw/XOM_4_20231219.html",
+        "./src/data/raw/XOM_4_20231222.html"
+      ],
+      "total_files": 16,
       "status": "success"
     },
     {
       "ticker": "CVX",
       "company_name": "Chevron Corporation",
       "sector": "Energy",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/CVX_10-K_20220224.html",
+        "./src/data/raw/CVX_10-K_20230223.html",
+        "./src/data/raw/CVX_10-Q_20230803.html",
+        "./src/data/raw/CVX_10-Q_20220804.html",
+        "./src/data/raw/CVX_10-Q_20230504.html",
+        "./src/data/raw/CVX_8-K_20231124.html",
+        "./src/data/raw/CVX_8-K_20231023.html",
+        "./src/data/raw/CVX_8-K_20231208.html",
+        "./src/data/raw/CVX_DEF 14A_20230412.html",
+        "./src/data/raw/CVX_DEF 14A_20220407.html",
+        "./src/data/raw/CVX_3_20230303.html",
+        "./src/data/raw/CVX_3_20220614.html",
+        "./src/data/raw/CVX_3_20230118.html",
+        "./src/data/raw/CVX_4_20231220.html"
+      ],
+      "total_files": 14,
       "status": "success"
     },
     {
       "ticker": "AMZN",
       "company_name": "Amazon.com Inc.",
       "sector": "Retail",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/AMZN_10-K_20230202.html",
+        "./src/data/raw/AMZN_10-K_20220203.html",
+        "./src/data/raw/AMZN_10-Q_20230427.html",
+        "./src/data/raw/AMZN_10-Q_20220728.html",
+        "./src/data/raw/AMZN_10-Q_20230803.html",
+        "./src/data/raw/AMZN_8-K_20230913.html",
+        "./src/data/raw/AMZN_8-K_20231026.html",
+        "./src/data/raw/AMZN_8-K_20231101.html",
+        "./src/data/raw/AMZN_DEF 14A_20230412.html",
+        "./src/data/raw/AMZN_DEF 14A_20220413.html",
+        "./src/data/raw/AMZN_3_20220705.html",
+        "./src/data/raw/AMZN_3_20230913.html",
+        "./src/data/raw/AMZN_4_20231124.html",
+        "./src/data/raw/AMZN_4_20231208.html",
+        "./src/data/raw/AMZN_4_20231127.html"
+      ],
+      "total_files": 15,
       "status": "success"
     },
     {
       "ticker": "WMT",
       "company_name": "Walmart Inc.",
       "sector": "Retail",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/WMT_10-K_20220318.html",
+        "./src/data/raw/WMT_10-K_20230317.html",
+        "./src/data/raw/WMT_10-Q_20221201.html",
+        "./src/data/raw/WMT_10-Q_20231130.html",
+        "./src/data/raw/WMT_10-Q_20230602.html",
+        "./src/data/raw/WMT_8-K_20230817.html",
+        "./src/data/raw/WMT_8-K_20230816.html",
+        "./src/data/raw/WMT_8-K_20230602.html",
+        "./src/data/raw/WMT_DEF 14A_20230420.html",
+        "./src/data/raw/WMT_DEF 14A_20220421.html",
+        "./src/data/raw/WMT_3_20230914.html",
+        "./src/data/raw/WMT_3_20220525.html",
+        "./src/data/raw/WMT_3_20220609.html",
+        "./src/data/raw/WMT_4_20231229.html"
+      ],
+      "total_files": 14,
       "status": "success"
     },
     {
       "ticker": "GE",
       "company_name": "General Electric Company",
       "sector": "Manufacturing",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/GE_10-K_20220211.html",
+        "./src/data/raw/GE_10-K_20230210.html",
+        "./src/data/raw/GE_10-Q_20230725.html",
+        "./src/data/raw/GE_10-Q_20220726.html",
+        "./src/data/raw/GE_10-Q_20230425.html",
+        "./src/data/raw/GE_8-K_20230725.html",
+        "./src/data/raw/GE_8-K_20230518.html",
+        "./src/data/raw/GE_8-K_20231114.html",
+        "./src/data/raw/GE_DEF 14A_20220317.html",
+        "./src/data/raw/GE_DEF 14A_20230316.html",
+        "./src/data/raw/GE_3_20231207.html",
+        "./src/data/raw/GE_3_20230515.html",
+        "./src/data/raw/GE_3_20230906.html",
+        "./src/data/raw/GE_4_20231003.html",
+        "./src/data/raw/GE_4_20231121.html",
+        "./src/data/raw/GE_5_20220214.html"
+      ],
+      "total_files": 16,
       "status": "success"
     },
     {
       "ticker": "CAT",
       "company_name": "Caterpillar Inc.",
       "sector": "Manufacturing",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/CAT_10-K_20230215.html",
+        "./src/data/raw/CAT_10-K_20220216.html",
+        "./src/data/raw/CAT_10-Q_20231101.html",
+        "./src/data/raw/CAT_10-Q_20220803.html",
+        "./src/data/raw/CAT_10-Q_20230802.html",
+        "./src/data/raw/CAT_8-K_20231031.html",
+        "./src/data/raw/CAT_8-K_20230809.html",
+        "./src/data/raw/CAT_8-K_20230901.html",
+        "./src/data/raw/CAT_DEF 14A_20230501.html",
+        "./src/data/raw/CAT_DEF 14A_20220428.html"
+      ],
+      "total_files": 10,
       "status": "success"
     },
     {
       "ticker": "BA",
       "company_name": "The Boeing Company",
       "sector": "Manufacturing",
-      "downloaded_files": [],
-      "total_files": 0,
+      "downloaded_files": [
+        "./src/data/raw/BA_10-K_20230127.html",
+        "./src/data/raw/BA_10-K_20220131.html",
+        "./src/data/raw/BA_10-Q_20230426.html",
+        "./src/data/raw/BA_10-Q_20220727.html",
+        "./src/data/raw/BA_10-Q_20231025.html",
+        "./src/data/raw/BA_8-K_20230824.html",
+        "./src/data/raw/BA_8-K_20231025.html",
+        "./src/data/raw/BA_8-K_20231211.html",
+        "./src/data/raw/BA_DEF 14A_20230303.html",
+        "./src/data/raw/BA_DEF 14A_20220311.html",
+        "./src/data/raw/BA_3_20230418.html",
+        "./src/data/raw/BA_3_20230503.html",
+        "./src/data/raw/BA_3_20230410.html"
+      ],
+      "total_files": 13,
       "status": "success"
     }
   ]

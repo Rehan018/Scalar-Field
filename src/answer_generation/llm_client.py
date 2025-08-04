@@ -1,56 +1,94 @@
-import google.generativeai as genai
+import requests
+import json
 from typing import List, Dict, Optional
 import time
 
-from config.settings import GEMINI_API_KEY, LLM_MODEL, MAX_TOKENS, TEMPERATURE
+from config.settings import LLM_MODEL, MAX_TOKENS, TEMPERATURE
 
 
 class LLMClient:
     def __init__(self):
-        genai.configure(api_key=GEMINI_API_KEY)
-        self.model_name = LLM_MODEL
+        self.ollama_url = "http://10.10.110.25:11434"
+        self.model_name = "llama3.1:8b"
         self.max_tokens = MAX_TOKENS
         self.temperature = TEMPERATURE
     
     def generate_answer(self, prompt: str, max_retries: int = 3) -> Dict:
-        """Generate answer using Gemini API."""
         
-        # Add system instruction to prompt
-        full_prompt = f"You are a financial analyst expert in SEC filings analysis.\n\n{prompt}"
+        optimized_prompt = self._optimize_prompt(prompt)
         
         for attempt in range(max_retries):
             try:
-                response = genai.generate_text(
-                    model=self.model_name,
-                    prompt=full_prompt,
-                    temperature=self.temperature,
-                    max_output_tokens=self.max_tokens
-                )
-                
-                return {
-                    "answer": response.result if response.result else "No response generated",
+                payload = {
                     "model": self.model_name,
-                    "tokens_used": 0,  # Token count not available in this version
-                    "status": "success"
+                    "prompt": optimized_prompt,
+                    "stream": False,
+                    "options": {
+                        "temperature": self.temperature,
+                        "num_predict": self.max_tokens
+                    }
                 }
                 
-            except Exception as e:
-                error_msg = str(e).lower()
+                response = requests.post(
+                    f"{self.ollama_url}/api/generate",
+                    json=payload,
+                    timeout=120
+                )
                 
-                # Handle rate limiting
-                if "quota" in error_msg or "rate" in error_msg:
-                    wait_time = (2 ** attempt) * 1
-                    print(f"Rate limit hit, waiting {wait_time} seconds...")
-                    time.sleep(wait_time)
-                    continue
+                if response.status_code == 200:
+                    result = response.json()
+                    answer_text = result.get("response", "").strip()
+                    
+                    if answer_text:
+                        return {
+                            "answer": answer_text,
+                            "model": self.model_name,
+                            "tokens_used": 0,
+                            "status": "success"
+                        }
+                    else:
+                        return {
+                            "answer": "No response generated from the model.",
+                            "status": "error",
+                            "error": "Empty response"
+                        }
+                else:
+                    print(f"Ollama API error (attempt {attempt + 1}): HTTP {response.status_code}")
+                    if attempt == max_retries - 1:
+                        return {
+                            "answer": "I apologize, but I'm unable to generate an answer due to a technical issue with the local model.",
+                            "status": "error",
+                            "error": f"HTTP {response.status_code}"
+                        }
                 
-                print(f"Gemini API error: {e}")
+            except requests.exceptions.Timeout:
+                print(f"Ollama API timeout (attempt {attempt + 1}/{max_retries})")
                 if attempt == max_retries - 1:
                     return {
-                        "answer": "I apologize, but I'm unable to generate an answer due to a technical issue.",
+                        "answer": "I apologize, but the request timed out. Please try again with a shorter query.",
+                        "status": "error",
+                        "error": "Request timeout"
+                    }
+                
+            except requests.exceptions.ConnectionError:
+                print(f"Ollama connection error (attempt {attempt + 1}/{max_retries})")
+                if attempt == max_retries - 1:
+                    return {
+                        "answer": "I apologize, but I cannot connect to the local model server. Please check if Ollama is running.",
+                        "status": "error",
+                        "error": "Connection error"
+                    }
+                
+            except Exception as e:
+                print(f"Ollama API error (attempt {attempt + 1}): {e}")
+                if attempt == max_retries - 1:
+                    return {
+                        "answer": "I apologize, but I'm unable to generate an answer due to an unexpected error.",
                         "status": "error",
                         "error": str(e)
                     }
+            
+            time.sleep(1)
         
         return {
             "answer": "I apologize, but I was unable to generate an answer after multiple attempts.",
@@ -58,8 +96,27 @@ class LLMClient:
             "error": "Max retries exceeded"
         }
     
+    def _optimize_prompt(self, prompt: str) -> str:
+        
+        system_instruction = "You are a financial analyst expert in SEC filings analysis. Provide accurate, concise answers with proper source attribution."
+        
+        if len(prompt) > 8000:
+            lines = prompt.split('\n')
+            if len(lines) > 20:
+                prompt = '\n'.join(lines[:10]) + '\n\n[Additional context truncated for brevity]\n\n' + '\n'.join(lines[-10:])
+        
+        return f"{system_instruction}\n\n{prompt}"
+    
+    def _calculate_backoff_time(self, attempt: int) -> int:
+        
+        import random
+        
+        base_wait = (2 ** (attempt + 1)) - 2
+        jitter = random.uniform(0.5, 1.5)
+        
+        return min(int(base_wait * jitter), 120)
+    
     def generate_summary(self, text: str, max_length: int = 200) -> str:
-        """Generate a summary of the given text."""
         
         prompt = f"""
         Please provide a concise summary of the following text in no more than {max_length} words:
@@ -73,7 +130,6 @@ class LLMClient:
         return result.get("answer", "Unable to generate summary")
     
     def extract_key_points(self, text: str, num_points: int = 5) -> List[str]:
-        """Extract key points from text."""
         
         prompt = f"""
         Extract the {num_points} most important key points from the following text:
@@ -86,12 +142,10 @@ class LLMClient:
         result = self.generate_answer(prompt)
         answer = result.get("answer", "")
         
-        # Parse numbered list
         points = []
         for line in answer.split('\n'):
             line = line.strip()
             if line and (line[0].isdigit() or line.startswith('-')):
-                # Remove numbering and clean up
                 clean_point = line.split('.', 1)[-1].strip()
                 if clean_point:
                     points.append(clean_point)
@@ -99,7 +153,6 @@ class LLMClient:
         return points[:num_points]
     
     def check_factual_consistency(self, answer: str, source_text: str) -> Dict:
-        """Check if answer is consistent with source text."""
         
         prompt = f"""
         Please evaluate if the following answer is factually consistent with the provided source text.
@@ -118,11 +171,9 @@ class LLMClient:
         
         result = self.generate_answer(prompt)
         
-        # Simple parsing of consistency check
         response = result.get("answer", "")
         
-        # Extract score (basic pattern matching)
-        score = 5  # Default
+        score = 5
         if "Score:" in response or "score" in response.lower():
             import re
             score_match = re.search(r'(\d+)', response)

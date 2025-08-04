@@ -19,7 +19,7 @@ class DataDownloader:
         print(f"Starting download for {ticker} - {COMPANIES[ticker]['name']}")
         
         try:
-            downloaded_files = self.sec_client.download_company_filings(
+            downloaded_files = self.download_company_filings_enhanced(
                 ticker, FILING_TYPES
             )
             
@@ -129,6 +129,36 @@ class DataDownloader:
             json.dump(log_data, f, indent=2)
         
         print(f"Download log saved to: {log_file}")
+    
+    def download_company_filings_enhanced(self, ticker: str, filing_types: List[str]) -> List[str]:
+        """Enhanced download method with fallback strategies."""
+        
+        downloaded_files = []
+        
+        for filing_type in filing_types:
+            print(f"Processing {filing_type} filings for {ticker}...")
+            
+            # Use enhanced search with fallback
+            filings = self.sec_client.search_filings_with_fallback(
+                ticker, filing_type, "2022-01-01", "2024-01-01"
+            )
+            
+            # Limit to 3 filings per type to manage API usage
+            limited_filings = filings[:3]
+            
+            for filing in limited_filings:
+                if filing.get("filing_url"):
+                    # Use enhanced download method
+                    filepath = self.sec_client.download_filing_enhanced(
+                        filing["filing_url"],
+                        filing["ticker"],
+                        filing["filing_type"],
+                        filing["filing_date"]
+                    )
+                    if filepath:
+                        downloaded_files.append(filepath)
+        
+        return downloaded_files
     
     def get_download_status(self) -> Dict:
         """Get status of previous downloads."""

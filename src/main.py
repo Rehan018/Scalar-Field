@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
-"""
-SEC Filings QA Agent - Main Application
-Entry point for the SEC filings question-answering system.
-"""
 
 import os
 import sys
 from typing import Dict, List
 
-# Add src to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from data_collection.data_downloader import DataDownloader
@@ -30,28 +25,22 @@ class SECFilingsQA:
         self.system_ready = False
         
     def setup_system(self):
-        """Initialize the complete system."""
-        
         print("=== SEC Filings QA Agent Setup ===")
         
-        # Step 1: Download data
         print("\n1. Downloading SEC filings...")
         download_results = self.downloader.download_all_companies()
         
         print(f"[OK] Downloaded {download_results['summary']['total_files_downloaded']} files")
         print(f"[OK] Success rate: {download_results['summary']['success_rate']}")
         
-        # Step 2: Process documents
         print("\n2. Processing documents...")
         self._process_documents()
         
         print(f"[OK] Created {len(self.chunks)} document chunks")
         
-        # Step 3: Store in vector database
         print("\n3. Building vector database...")
         self.vector_db.add_chunks(self.chunks)
         
-        # Step 4: Display statistics
         self._display_statistics()
         
         self.system_ready = True
@@ -59,9 +48,6 @@ class SECFilingsQA:
         return True
     
     def _process_documents(self):
-        """Process all downloaded documents into chunks."""
-        
-        # Get all HTML files
         html_files = []
         if os.path.exists(RAW_DATA_DIR):
             for filename in os.listdir(RAW_DATA_DIR):
@@ -72,12 +58,9 @@ class SECFilingsQA:
             print("[WARNING] No HTML files found to process")
             return
         
-        # Process files into chunks
         self.chunks = self.chunker.chunk_multiple_files(html_files)
     
     def _display_statistics(self):
-        """Display system statistics."""
-        
         if not self.chunks:
             print("[WARNING] No chunks available for statistics")
             return
@@ -100,8 +83,6 @@ class SECFilingsQA:
             print(f"{filing_type}: {count} chunks")
     
     def query(self, question: str) -> Dict:
-        """Process a query and return an answer."""
-        
         if not self.system_ready:
             return {
                 "answer": "[ERROR] System not initialized. Please run setup_system() first.",
@@ -111,14 +92,12 @@ class SECFilingsQA:
             }
         
         try:
-            # Route and analyze the query
             print(f"\n🔍 Processing query: {question}")
             query_analysis = self.query_router.route_query(question)
             
             print(f"Query type: {query_analysis['query_type']}")
             print(f"Found {len(query_analysis['relevant_documents'])} relevant documents")
             
-            # Generate answer
             result = self.answer_synthesizer.synthesize_answer(query_analysis)
             
             return result
@@ -134,18 +113,13 @@ class SECFilingsQA:
             }
     
     def get_system_status(self) -> Dict:
-        """Get current system status."""
-        
-        # Check download status
         download_status = self.downloader.get_download_status()
         
-        # Check processing status
         processing_status = {
             "chunks_loaded": len(self.chunks),
             "chunks_available": len(self.chunks) > 0
         }
         
-        # Check vector database status
         vector_db_stats = self.vector_db.get_collection_stats()
         
         return {
@@ -157,15 +131,11 @@ class SECFilingsQA:
 
 
 def main():
-    """Main function for command-line usage."""
-    
     print("SEC Filings QA Agent")
     print("===================")
     
-    # Initialize system
     qa_system = SECFilingsQA()
     
-    # Check if we have existing data
     status = qa_system.get_system_status()
     
     if not status["system_ready"]:
@@ -178,7 +148,6 @@ def main():
         print("[OK] System already initialized")
         qa_system._display_statistics()
     
-    # Interactive mode
     print("\n=== Interactive Mode ===")
     print("Enter your questions about SEC filings (type 'quit' to exit)")
     
@@ -198,8 +167,8 @@ def main():
             print(f"\nConfidence: {result['confidence']:.2f}")
             
             if result.get('sources'):
-                print(f"\nSources ({len(result['sources'])}):")  
-                for source in result['sources'][:3]:  # Show top 3 sources
+                print(f"\nSources ({len(result['sources'])}):")
+                for source in result['sources'][:3]:
                     print(f"- {source['citation_text']}")
             
             if result['status'] != 'success':

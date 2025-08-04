@@ -7,11 +7,10 @@ from config.settings import COMPANIES
 
 class EntityExtractor:
     def __init__(self):
-        # Create ticker to company name mapping
         self.ticker_to_name = {ticker: info["name"] for ticker, info in COMPANIES.items()}
         self.name_to_ticker = {info["name"].lower(): ticker for ticker, info in COMPANIES.items()}
         
-        # Common company name variations
+        
         self.company_variations = {
             "apple": "AAPL",
             "microsoft": "MSFT",
@@ -35,30 +34,63 @@ class EntityExtractor:
         }
     
     def extract_tickers(self, query: str) -> List[str]:
-        """Extract company tickers from query."""
         
         tickers = set()
         query_lower = query.lower()
         
-        # Direct ticker matches
+        
         for ticker in COMPANIES.keys():
-            if ticker.lower() in query_lower:
-                tickers.add(ticker)
+            pattern = r'\b' + re.escape(ticker.lower()) + r'\b'
+            if re.search(pattern, query_lower):
+                if len(ticker) <= 2:
+                    if self._validate_short_ticker_context(query_lower, ticker.lower()):
+                        tickers.add(ticker)
+                else:
+                    tickers.add(ticker)
         
-        # Company name matches
         for name_variant, ticker in self.company_variations.items():
-            if name_variant in query_lower:
+            pattern = r'\b' + re.escape(name_variant) + r'\b'
+            if re.search(pattern, query_lower):
                 tickers.add(ticker)
         
-        # Full company name matches
+        
         for full_name, ticker in self.name_to_ticker.items():
             if full_name in query_lower:
                 tickers.add(ticker)
         
         return list(tickers)
     
+    def _validate_short_ticker_context(self, query_lower: str, ticker: str) -> bool:
+        
+        false_positive_contexts = {
+            'ge': ['general', 'generate', 'generation', 'genetic', 'geography', 'geometry'],
+            'ba': ['bachelor', 'basic', 'basketball', 'battle'],
+            'cat': ['category', 'catalog', 'catch', 'cattle'],
+            'cvx': [],
+            'ge': ['general', 'generate', 'generation', 'genetic', 'geography', 'geometry']
+        }
+        
+        if ticker not in false_positive_contexts:
+            return True
+        
+        for false_context in false_positive_contexts[ticker]:
+            if false_context in query_lower:
+                ticker_pattern = r'\b' + re.escape(ticker) + r'\b'
+                false_pattern = r'\b' + re.escape(false_context) + r'\b'
+                
+                ticker_matches = list(re.finditer(ticker_pattern, query_lower))
+                false_matches = list(re.finditer(false_pattern, query_lower))
+                
+                for ticker_match in ticker_matches:
+                    for false_match in false_matches:
+                        if (abs(ticker_match.start() - false_match.start()) < len(false_context) or
+                            ticker_match.start() >= false_match.start() and 
+                            ticker_match.end() <= false_match.end()):
+                            return False
+        
+        return True
+    
     def extract_time_periods(self, query: str) -> Dict:
-        """Extract time periods and dates from query."""
         
         time_info = {
             "years": [],
@@ -67,12 +99,10 @@ class EntityExtractor:
             "relative_terms": []
         }
         
-        # Extract years (2020-2024)
         year_pattern = r'\b(20[2-4][0-9])\b'
         years = re.findall(year_pattern, query)
         time_info["years"] = list(set(years))
         
-        # Extract quarters
         quarter_patterns = [
             r'\bQ[1-4]\b',
             r'\b[1-4]Q\b',
@@ -86,7 +116,6 @@ class EntityExtractor:
             matches = re.findall(pattern, query, re.IGNORECASE)
             time_info["quarters"].extend(matches)
         
-        # Extract relative time terms
         relative_terms = [
             "recent", "latest", "current", "last year", "this year",
             "over time", "historical", "trend", "evolution"
@@ -99,12 +128,10 @@ class EntityExtractor:
         return time_info
     
     def extract_filing_types(self, query: str) -> List[str]:
-        """Extract SEC filing types from query."""
         
         filing_types = []
         query_lower = query.lower()
         
-        # Direct filing type matches
         filing_patterns = {
             r'\b10-k\b': '10-K',
             r'\bannual report\b': '10-K',
@@ -128,7 +155,6 @@ class EntityExtractor:
         return list(set(filing_types))
     
     def extract_financial_concepts(self, query: str) -> List[str]:
-        """Extract financial concepts and topics."""
         
         concepts = []
         query_lower = query.lower()
@@ -157,7 +183,6 @@ class EntityExtractor:
         return concepts
     
     def extract_comparison_intent(self, query: str) -> Dict:
-        """Detect if query involves comparison between entities."""
         
         comparison_info = {
             "is_comparison": False,
@@ -165,7 +190,6 @@ class EntityExtractor:
             "entities": []
         }
         
-        # Comparison keywords
         comparison_keywords = [
             "compare", "comparison", "versus", "vs", "against",
             "difference", "similar", "contrast", "between"
@@ -176,7 +200,6 @@ class EntityExtractor:
         if any(keyword in query_lower for keyword in comparison_keywords):
             comparison_info["is_comparison"] = True
             
-            # Determine comparison type
             if "trend" in query_lower or "over time" in query_lower:
                 comparison_info["comparison_type"] = "temporal"
             elif len(self.extract_tickers(query)) > 1:
@@ -189,7 +212,6 @@ class EntityExtractor:
         return comparison_info
     
     def extract_all_entities(self, query: str) -> Dict:
-        """Extract all entities from query in one pass."""
         
         return {
             "tickers": self.extract_tickers(query),

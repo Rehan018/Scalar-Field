@@ -18,14 +18,12 @@ class VectorDB:
         self.embeddings_data = []
         self.metadata_index = {}
         
-        # Enhanced storage with persistence
         os.makedirs(CHROMA_PERSIST_DIRECTORY, exist_ok=True)
         self.storage_path = os.path.join(CHROMA_PERSIST_DIRECTORY, f"{collection_name}.pkl")
         self._load_from_disk()
         print("[INFO] Enhanced vector storage initialized")
     
     def add_chunks(self, chunks: List[DocumentChunk]):
-        """Add document chunks with embeddings and indexing."""
         
         if not chunks:
             print("No chunks to add")
@@ -33,15 +31,13 @@ class VectorDB:
         
         print(f"Adding {len(chunks)} chunks to vector database...")
         
-        # Generate embeddings for all chunks
-        texts = [chunk.text for chunk in chunks]
+        texts = [chunk.content for chunk in chunks]
         print("Generating embeddings...")
         embeddings = self.embedding_generator.generate_embeddings(texts)
         
-        # Store chunks with embeddings and build indexes
         for i, chunk in enumerate(chunks):
             chunk_data = {
-                'text': chunk.text,
+                'text': chunk.content,
                 'metadata': chunk.metadata,
                 'chunk_id': chunk.chunk_id,
                 'embedding': embeddings[i] if len(embeddings) > i else None,
@@ -50,49 +46,45 @@ class VectorDB:
             
             self.chunks_data.append(chunk_data)
             
-            # Build metadata indexes for faster filtering
             self._update_metadata_index(chunk.metadata, len(self.chunks_data) - 1)
         
-        # Save to disk
         self._save_to_disk()
         print(f"[OK] Successfully added {len(chunks)} chunks to vector database")
     
     def search(self, query: str, n_results: int = 10, 
                filters: Optional[Dict] = None) -> List[Dict]:
-        """Enhanced search with semantic similarity and keyword matching."""
         
         if not self.chunks_data:
             return []
         
-        # Get filtered chunk indices
         candidate_indices = self._apply_filters(filters) if filters else list(range(len(self.chunks_data)))
         
         if not candidate_indices:
             return []
         
-        # Generate query embedding for semantic search
         query_embedding = self.embedding_generator.generate_single_embedding(query)
         
-        # Calculate similarities
         results = []
-        query_words = query.lower().split()
+        query_words = self._extract_meaningful_words(query)
         
         for idx in candidate_indices:
             chunk = self.chunks_data[idx]
             
-            # Semantic similarity (if embeddings available)
             semantic_score = 0.0
             if chunk.get('embedding') is not None:
-                semantic_score = self._cosine_similarity(query_embedding, chunk['embedding'])
+                raw_semantic_score = self._cosine_similarity(query_embedding, chunk['embedding'])
+                semantic_score = max(0.0, raw_semantic_score)
             
-            # Keyword similarity
-            text_lower = chunk['text'].lower()
-            keyword_score = sum(1 for word in query_words if word in text_lower) / len(query_words)
+            keyword_score = self._calculate_enhanced_keyword_score(chunk['text'], query_words)
             
-            # Combined score (weighted)
-            combined_score = 0.7 * semantic_score + 0.3 * keyword_score
+            if self.embedding_generator.use_fallback:
+                combined_score = 0.4 * semantic_score + 0.6 * keyword_score
+                min_threshold = 0.05
+            else:
+                combined_score = 0.7 * semantic_score + 0.3 * keyword_score
+                min_threshold = 0.1
             
-            if combined_score > 0.1:  # Minimum threshold
+            if combined_score > min_threshold:
                 results.append({
                     "text": chunk['text'],
                     "metadata": chunk['metadata'],
@@ -102,12 +94,10 @@ class VectorDB:
                     "keyword_score": keyword_score
                 })
         
-        # Sort by combined similarity and return top results
         results.sort(key=lambda x: x['similarity'], reverse=True)
         return results[:n_results]
     
     def get_collection_stats(self) -> Dict:
-        """Get comprehensive statistics about the collection."""
         
         if not self.chunks_data:
             return {"total_chunks": 0}
@@ -132,7 +122,6 @@ class VectorDB:
             if "chunk_word_count" in metadata:
                 word_counts.append(metadata["chunk_word_count"])
         
-        # Calculate additional stats
         avg_word_count = sum(word_counts) / len(word_counts) if word_counts else 0
         total_words = sum(word_counts) if word_counts else 0
         
@@ -158,7 +147,6 @@ class VectorDB:
         }
     
     def search_by_metadata(self, metadata_filters: Dict, n_results: int = 10) -> List[Dict]:
-        """Search chunks by metadata only."""
         
         candidate_indices = self._apply_filters(metadata_filters)
         results = []
@@ -169,13 +157,12 @@ class VectorDB:
                 "text": chunk['text'],
                 "metadata": chunk['metadata'],
                 "chunk_id": chunk['chunk_id'],
-                "similarity": 1.0  # Perfect match for metadata search
+                "similarity": 1.0
             })
         
         return results
     
     def get_chunk_by_id(self, chunk_id: str) -> Optional[Dict]:
-        """Get a specific chunk by its ID."""
         
         for chunk in self.chunks_data:
             if chunk['chunk_id'] == chunk_id:
@@ -187,7 +174,6 @@ class VectorDB:
         return None
     
     def get_similar_chunks(self, chunk_id: str, n_results: int = 5) -> List[Dict]:
-        """Find chunks similar to a given chunk."""
         
         target_chunk = None
         for chunk in self.chunks_data:
@@ -216,7 +202,6 @@ class VectorDB:
         return results[:n_results]
     
     def _apply_filters(self, filters: Dict) -> List[int]:
-        """Apply metadata filters and return matching chunk indices."""
         
         if not filters:
             return list(range(len(self.chunks_data)))
@@ -247,7 +232,6 @@ class VectorDB:
         return matching_indices
     
     def _cosine_similarity(self, vec1: np.ndarray, vec2: np.ndarray) -> float:
-        """Calculate cosine similarity between two vectors."""
         
         try:
             dot_product = np.dot(vec1, vec2)
@@ -262,9 +246,14 @@ class VectorDB:
             return 0.0
     
     def _update_metadata_index(self, metadata: Dict, chunk_index: int):
-        """Update metadata indexes for faster filtering."""
         
         for key, value in metadata.items():
+            if isinstance(value, (dict, list)):
+                continue
+                
+            if not isinstance(value, (str, int, float, bool, type(None))):
+                value = str(value)
+            
             if key not in self.metadata_index:
                 self.metadata_index[key] = {}
             
@@ -274,7 +263,6 @@ class VectorDB:
             self.metadata_index[key][value].append(chunk_index)
     
     def _save_to_disk(self):
-        """Save collection to disk for persistence."""
         
         try:
             data = {
@@ -291,7 +279,6 @@ class VectorDB:
             print(f"[WARNING] Failed to save to disk: {e}")
     
     def _load_from_disk(self):
-        """Load collection from disk if exists."""
         
         try:
             if os.path.exists(self.storage_path):
@@ -304,13 +291,37 @@ class VectorDB:
                 if self.chunks_data:
                     print(f"[INFO] Loaded {len(self.chunks_data)} chunks from disk")
                     
+                    if hasattr(self.embedding_generator, 'use_fallback') and self.embedding_generator.use_fallback:
+                        self._fit_tfidf_on_loaded_data()
+                    
         except Exception as e:
             print(f"[WARNING] Failed to load from disk: {e}")
             self.chunks_data = []
             self.metadata_index = {}
     
+    def _fit_tfidf_on_loaded_data(self):
+        
+        try:
+            if not self.chunks_data:
+                return
+            
+            print("[INFO] Fitting TF-IDF on loaded document corpus...")
+            
+            texts = [chunk['text'] for chunk in self.chunks_data]
+            
+            batch_size = 500
+            if len(texts) <= batch_size:
+                self.embedding_generator.generate_embeddings(texts)
+            else:
+                print(f"[INFO] Processing {len(texts)} texts in batches of {batch_size}")
+                self.embedding_generator.generate_embeddings(texts[:batch_size])
+            
+            print("[INFO] TF-IDF system fitted on document corpus")
+            
+        except Exception as e:
+            print(f"[WARNING] Failed to fit TF-IDF on loaded data: {e}")
+    
     def delete_collection(self):
-        """Delete the entire collection."""
         
         self.chunks_data = []
         self.metadata_index = {}
@@ -321,8 +332,37 @@ class VectorDB:
         print(f"Deleted collection: {self.collection_name}")
     
     def reset_collection(self):
-        """Reset the collection (delete and recreate)."""
         
         self.chunks_data = []
         self.metadata_index = {}
         print(f"Reset collection: {self.collection_name}")
+    
+    def _extract_meaningful_words(self, query: str) -> List[str]:
+        
+        import re
+        
+        stop_words = {
+            "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", 
+            "for", "of", "with", "by", "what", "how", "when", "where", "why",
+            "is", "are", "was", "were", "be", "been", "being", "have", "has", "had"
+        }
+        
+        words = re.findall(r'\b\w+\b', query.lower())
+        meaningful_words = [word for word in words if word not in stop_words and len(word) > 2]
+        
+        return meaningful_words
+    
+    def _calculate_enhanced_keyword_score(self, text: str, query_words: List[str]) -> float:
+        
+        if not query_words:
+            return 0.0
+        
+        text_lower = text.lower()
+        
+        exact_matches = sum(1 for word in query_words if f" {word} " in f" {text_lower} ")
+        
+        partial_matches = sum(1 for word in query_words if word in text_lower and f" {word} " not in f" {text_lower} ")
+        
+        total_score = (exact_matches * 1.0 + partial_matches * 0.5) / len(query_words)
+        
+        return min(1.0, total_score)

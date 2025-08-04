@@ -19,15 +19,11 @@ class QueryRouter:
         self.retrieval_engine = RetrievalEngine()
     
     def route_query(self, query: str) -> Dict:
-        """Analyze query and route to appropriate processing strategy."""
         
-        # Extract entities
         entities = self.entity_extractor.extract_all_entities(query)
         
-        # Determine query type
         query_type = self._determine_query_type(entities)
         
-        # Get relevant documents
         relevant_docs = self._retrieve_relevant_documents(query, entities, query_type)
         
         return {
@@ -39,38 +35,31 @@ class QueryRouter:
         }
     
     def _determine_query_type(self, entities: Dict) -> QueryType:
-        """Determine the type of query based on extracted entities."""
         
         tickers = entities["tickers"]
         time_periods = entities["time_periods"]
         comparison_intent = entities["comparison_intent"]
         
-        # Multi-company comparison
         if len(tickers) > 1 or comparison_intent["is_comparison"]:
             if comparison_intent["comparison_type"] == "temporal":
                 return QueryType.TEMPORAL_ANALYSIS
             else:
                 return QueryType.MULTI_COMPANY
         
-        # Single company with temporal aspect
         elif len(tickers) == 1 and (time_periods["years"] or time_periods["relative_terms"]):
             return QueryType.TEMPORAL_ANALYSIS
         
-        # Single company query
         elif len(tickers) == 1:
             return QueryType.SINGLE_COMPANY
         
-        # Cross-sectional analysis (no specific company)
         elif entities["financial_concepts"]:
             return QueryType.CROSS_SECTIONAL
         
-        # General search
         else:
             return QueryType.GENERAL_SEARCH
     
     def _retrieve_relevant_documents(self, query: str, entities: Dict, 
                                    query_type: QueryType) -> List[Dict]:
-        """Retrieve relevant documents based on query type and entities."""
         
         tickers = entities["tickers"]
         filing_types = entities["filing_types"]
@@ -88,22 +77,18 @@ class QueryRouter:
         elif query_type == QueryType.CROSS_SECTIONAL:
             return self._retrieve_cross_sectional(query, entities["financial_concepts"])
         
-        else:  # GENERAL_SEARCH
+        else:
             return self._retrieve_general(query)
     
     def _retrieve_single_company(self, query: str, ticker: str, 
                                filing_types: List[str], 
                                time_periods: Dict) -> List[Dict]:
-        """Retrieve documents for single company query."""
         
-        # Apply filters
         filters = {"ticker": ticker}
         
         if filing_types:
-            # Use the first filing type as primary filter
             filters["filing_type"] = filing_types[0]
         
-        # Date range filtering
         date_range = None
         if time_periods["years"]:
             year = time_periods["years"][0]
@@ -118,9 +103,12 @@ class QueryRouter:
     
     def _retrieve_multi_company(self, query: str, tickers: List[str], 
                               filing_types: List[str]) -> List[Dict]:
-        """Retrieve documents for multi-company comparison."""
         
         all_results = []
+        
+        if not tickers:
+            return self._retrieve_general(query)
+        
         results_per_company = max(5, 20 // len(tickers))
         
         for ticker in tickers:
@@ -131,21 +119,18 @@ class QueryRouter:
             )
             all_results.extend(company_results)
         
-        # Sort by relevance
         all_results.sort(key=lambda x: x["similarity"], reverse=True)
         
         return all_results[:20]
     
     def _retrieve_temporal(self, query: str, tickers: List[str], 
                          time_periods: Dict) -> List[Dict]:
-        """Retrieve documents for temporal analysis."""
         
         results = []
         
         if tickers:
             ticker = tickers[0]
             
-            # If specific years mentioned, search across those years
             if time_periods["years"]:
                 for year in time_periods["years"]:
                     year_results = self.retrieval_engine.search_temporal(
@@ -153,21 +138,17 @@ class QueryRouter:
                     )
                     results.extend(year_results)
             else:
-                # General temporal search
                 results = self.retrieval_engine.search_with_filters(
                     query, ticker=ticker, n_results=20
                 )
         else:
-            # Cross-company temporal analysis
             results = self.retrieval_engine.search_temporal(query)
         
         return results[:20]
     
     def _retrieve_cross_sectional(self, query: str, 
                                 concepts: List[str]) -> List[Dict]:
-        """Retrieve documents for cross-sectional analysis."""
         
-        # Use hybrid search for better concept matching
         results = self.retrieval_engine.hybrid_search(
             query, keyword_boost=0.4, n_results=25
         )
@@ -175,7 +156,6 @@ class QueryRouter:
         return results
     
     def _retrieve_general(self, query: str) -> List[Dict]:
-        """Retrieve documents for general search."""
         
         return self.retrieval_engine.hybrid_search(
             query, keyword_boost=0.3, n_results=15
@@ -183,7 +163,6 @@ class QueryRouter:
     
     def _get_processing_strategy(self, query_type: QueryType, 
                                entities: Dict) -> Dict:
-        """Get processing strategy for the query type."""
         
         strategies = {
             QueryType.SINGLE_COMPANY: {
@@ -216,24 +195,18 @@ class QueryRouter:
         return strategies.get(query_type, strategies[QueryType.GENERAL_SEARCH])
     
     def get_query_complexity(self, entities: Dict) -> str:
-        """Assess query complexity."""
         
         complexity_score = 0
         
-        # Multiple tickers increase complexity
         complexity_score += len(entities["tickers"]) * 2
         
-        # Multiple time periods increase complexity
         complexity_score += len(entities["time_periods"]["years"])
         
-        # Multiple filing types increase complexity
         complexity_score += len(entities["filing_types"])
         
-        # Comparison queries are more complex
         if entities["comparison_intent"]["is_comparison"]:
             complexity_score += 3
         
-        # Multiple financial concepts increase complexity
         complexity_score += len(entities["financial_concepts"])
         
         if complexity_score <= 3:
