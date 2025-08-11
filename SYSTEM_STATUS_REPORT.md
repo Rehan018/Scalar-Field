@@ -21,7 +21,7 @@ The SEC Filings QA Agent is **FULLY OPERATIONAL** and ready for production use. 
 | Component | Status | Details |
 |-----------|--------|---------|
 | **Environment Configuration** | ✅ PASS | All variables loaded correctly |
-| **Ollama Server Connection** | ✅ PASS | Connected to http://10.10.110.25:11434 |
+| **Ollama Server Connection** | ✅ PASS | Connected to http://localhost:11434 |
 | **Model Availability** | ✅ PASS | llama3.1:8b model available |
 | **Directory Structure** | ✅ PASS | All paths created and writable |
 | **Dependencies** | ✅ PASS | All required packages installed |
